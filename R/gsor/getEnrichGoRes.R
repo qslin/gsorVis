@@ -94,13 +94,22 @@ getKeggOrg <- function(refGenome) {
   return(keggOrg)
 } 
 ## ---
-get.t2g <- function(refGenome, category) {
+get.t2g <- function(refGenome, category, subcategory=NULL) {
   print(sprintf("GSOR conducted on BROAD MSigDB category: %s.", category))
   library(msigdbr)
   if (refGenome == 'human' | refGenome == 'hs' ) {
-    m_t2g       <- msigdbr(species = "Homo sapiens", category = category) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    if (!is.null(subcategory)){
+      m_t2g       <- msigdbr(species = "Homo sapiens", category = category, subcategory = subcategory) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    } else {
+      m_t2g       <- msigdbr(species = "Homo sapiens", category = category) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    }
+    
   } else if (refGenome == 'mouse' | refGenome == 'mm' ) {
-    m_t2g       <- msigdbr(species = "Mus musculus", category = category) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    if (!is.null(subcategory)){
+      m_t2g       <- msigdbr(species = "Mus musculus", category = category, subcategory = subcategory) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    } else {
+      m_t2g       <- msigdbr(species = "Mus musculus", category = category) %>% dplyr::select(gs_name, entrez_gene) %>% as.data.frame()
+    }
   } else {
     stop("HALLMARK analysis only can be conducted with human or mouse gene lists input.")
   }
@@ -373,7 +382,7 @@ cpORTest <- function(gsorInputGenes, gsorInputGenesType, refGenome, functionDB) 
     if (is.list(gsorInputGenes)) {
       hmORres                      <- compareCluster(geneCluster   = pathwayGeneEntrezidInput, 
                                                      fun           = 'enricher',
-                                                     TERM2GENE = get.t2g(refGenome = refGenome, category = broadMSigDB.category), 
+                                                     TERM2GENE = get.t2g(refGenome = refGenome, category = broadMSigDB.category, subcategory = broadMSigDB.subcategory), 
                                                      minGSSize = 1, maxGSSize = 500, 
                                                      pvalueCutoff  = 1, 
                                                      qvalueCutoff  = 1, 
@@ -383,7 +392,7 @@ cpORTest <- function(gsorInputGenes, gsorInputGenesType, refGenome, functionDB) 
       gsorCPres                       <- as.data.frame(hmORres@compareClusterResult)
     } else {
       hmORres                <- enricher(gene = pathwayGeneEntrezidInput, 
-                                         TERM2GENE = get.t2g(refGenome = refGenome, category = broadMSigDB.category), 
+                                         TERM2GENE = get.t2g(refGenome = refGenome, category = broadMSigDB.category, subcategory = broadMSigDB.subcategory), 
                                          minGSSize = 1, maxGSSize = 500, 
                                          pvalueCutoff  = 1, 
                                          qvalueCutoff  = 1, 
