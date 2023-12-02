@@ -92,6 +92,12 @@ parser$add_argument("--broadMSigDBCategory", nargs = 1,
                     type="character", help="Default running on BroadMSigDB Hallmark category. If 'runBroadMSigDB' is on, you can specifiy the Broad MSigDB category here, options are H (hallmark gene sets), C1 (positional gene sets), C2 (curated gene sets), CGP (chemical and genetic pertubations), CP (cannonical pathways), C7 (immunologica signature gene sets).",
                     metavar = '')
 
+parser$add_argument("--broadMSigDBSubCategory", nargs = 1,
+                    default = 'NULL',
+                    type="character", help="Default without running on BroadMSigDB subcategory.",
+                    metavar = '')
+
+
 ## ------
 args <- parser$parse_args()
 print(args)
@@ -127,6 +133,7 @@ runHumanDisease             <- as.logical(args$runHumanDisease)
 runNetworkCancerGenes       <- as.logical(args$runNetworkCancerGenes)
 runBroadMSigDB              <- as.logical(args$runBroadMSigDB)
 broadMSigDB.category        <- as.character(args$broadMSigDBCategory)
+broadMSigDB.subcategory     <- as.character(args$broadMSigDBSubCategory)
 topN                        <- as.numeric(args$topN)
 ## ----------------------------------------------------------------- ##
 # print(sprintf("cpEnrichGoInputType=%s", cpEnrichGoInputType)) ##for debug
