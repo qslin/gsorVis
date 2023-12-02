@@ -357,15 +357,27 @@ if (runNetworkCancerGenes) {
 ## 2.6 if 'broadMSigDB' on, use cpORTest() function to conduct Broad MSigDB pathway over representation analysis
 if (runBroadMSigDB) {
   # print("00000000000") ## for debug
-  print(sprintf('Start step 2.6 hallmarker genes (%s) over-representation analysis', broadMSigDB.category))
+  if (!is.null(broadMSigDB.subcategory)){
+    print(sprintf('Start step 2.6 category (%s), subcategory (%s), over-representation analysis', broadMSigDB.category, broadMSigDB.subcategory))
+  }else {
+    print(sprintf('Start step 2.6 category (%s) over-representation analysis', broadMSigDB.category))
+  }
+  
   # print("00000000000") ## for debug
   cpHallmarkRes <-  cpORTest(gsorInputGenes     = cpEnrInputGeneLists,
                              gsorInputGenesType = geneListsType,
                              refGenome          = refGenome4cpenrichGo,
                              functionDB         = 'broadMSigDB')
-  resFnamePrefix = paste(enrichGoResSaveDir, '/', resFnameSuffix, sprintf('_cpEnrich_broadMsigDB_category_%s_clustered_res', broadMSigDB.category), sep = '')
-  outputCpORTestRes(cpORTestRes = cpHallmarkRes, resFnamePrefix = resFnamePrefix, plotTitle = 'hallmark Enrichment')
-  print(sprintf('END step 2.6 hallmarker genes (%s) over-representation analysis', broadMSigDB.category))
+  if (!is.null(broadMSigDB.subcategory)) {
+    resFnamePrefix = paste(enrichGoResSaveDir, '/', resFnameSuffix, sprintf('_cpEnrich_broadMsigDB_category_%s_subCat_%s_clustered_res', broadMSigDB.category, broadMSigDB.subcategory), sep = '')
+    outputCpORTestRes(cpORTestRes = cpHallmarkRes, resFnamePrefix = resFnamePrefix, plotTitle = 'Enrichment')
+    print(sprintf('END step 2.6 category (%s), subcategory (%s), over-representation analysis', broadMSigDB.category, broadMSigDB.subcategory))
+  } else {
+    resFnamePrefix = paste(enrichGoResSaveDir, '/', resFnameSuffix, sprintf('_cpEnrich_broadMsigDB_category_%s_clustered_res', broadMSigDB.category), sep = '')
+    outputCpORTestRes(cpORTestRes = cpHallmarkRes, resFnamePrefix = resFnamePrefix, plotTitle = 'Enrichment')
+    print(sprintf('END step 2.6 category (%s) over-representation analysis', broadMSigDB.category))
+  }
+  
 }
 ## ---
 print('END step 2: END GSOR analysis')
