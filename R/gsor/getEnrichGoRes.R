@@ -409,6 +409,57 @@ cpORTest <- function(gsorInputGenes, gsorInputGenesType, refGenome, functionDB) 
     print(sprintf('END over representation for Broad MSigDB gene module categories DB.'))
     print('***')
     # ---
+  } else if ( endsWith(functionDB, '.txt') | endsWith(functionDB, '.gmt') ) {
+    # ---
+    print('===')
+    print(sprintf('START over representation for customized gene sets: %s.', functionDB))
+    
+    txtInputDF <- tryCatch({
+      read.table(functionDB, header = T, sep = "\t")
+    }, error = function(err){
+      gene_sets <- readLines(functionDB)
+      gene_set_df <- data.frame(gs_name = character(), entrez_gene = character(), stringsAsFactors = FALSE)
+      for (gene_set_line in gene_sets) {
+        gene_set_fields <- strsplit(gene_set_line, "\t")[[1]]
+        gene_set_name <- gene_set_fields[1]
+        gene_ids <- gene_set_fields[-c(1,2)]
+        gene_ids <- unlist(strsplit(gene_ids, "\t"))
+        gene_set_data <- data.frame(gs_name = gene_set_name, entrez_gene = gene_ids, stringsAsFactors = FALSE)
+        gene_set_df <- rbind(gene_set_df, gene_set_data)
+      }
+      gene_set_df
+    })
+
+    if (is.list(gsorInputGenes)) {
+      hmORres                      <- compareCluster(geneCluster   = pathwayGeneEntrezidInput, 
+                                                     fun           = 'enricher',
+                                                     TERM2GENE = txtInputDF, 
+                                                     minGSSize = 1, maxGSSize = 500, 
+                                                     pvalueCutoff  = 1, 
+                                                     qvalueCutoff  = 1, 
+                                                     pAdjustMethod = 'BH')
+      orRes4plot                      <- hmORres
+      orRes4plot@compareClusterResult <- subset(orRes4plot@compareClusterResult, p.adjust <= 0.25)
+      gsorCPres                       <- as.data.frame(hmORres@compareClusterResult)
+    } else {
+      hmORres                <- enricher(gene = pathwayGeneEntrezidInput, 
+                                         TERM2GENE = txtInputDF, 
+                                         minGSSize = 1, maxGSSize = 500, 
+                                         pvalueCutoff  = 1, 
+                                         qvalueCutoff  = 1, 
+                                         pAdjustMethod = 'BH')
+      
+      orRes4plot                 <- hmORres
+      orRes4plot                 <- subset(hmORres@result, p.adjust <= 0.25)
+      gsorCPres                  <- hmORres@result
+    }
+    for (r in 1:dim(gsorCPres)[1]) {
+      gsorCPres$geneSymbol[r] <- suppressMessages(paste(getGeneListGeneSymbol(inputGeneList = strsplit(gsorCPres$geneID[r], split = '/')[[1]], geneListsType = 'entrezID', refGenome = refGenome), collapse = '/'))
+      
+    }
+    print(sprintf('END over representation for customized gene module categories DB.'))
+    print('***')
+    # ---
   } else if ( functionDB == 'ncg' ) {
     library(DOSE)
     # ---

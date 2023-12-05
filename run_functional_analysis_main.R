@@ -97,7 +97,15 @@ parser$add_argument("--broadMSigDBSubCategory", nargs = 1,
                     type="character", help="Default without running on BroadMSigDB subcategory.",
                     metavar = '')
 
+parser$add_argument("--runCustomizedDB", nargs = 1,
+                    default = 'F',
+                    type="character", help="Required: whether to use customized gene sets for enrichment analysis.",
+                    metavar = '')
 
+parser$add_argument("--CustomizedDB", nargs = 1,
+                    default = NULL,
+                    type="character", help="If 'runCustomizedDB' is on, you can specifiy the customized gene sets in txt format here.",
+                    metavar = '')
 ## ------
 args <- parser$parse_args()
 print(args)
@@ -134,6 +142,8 @@ runNetworkCancerGenes       <- as.logical(args$runNetworkCancerGenes)
 runBroadMSigDB              <- as.logical(args$runBroadMSigDB)
 broadMSigDB.category        <- as.character(args$broadMSigDBCategory)
 broadMSigDB.subcategory     <- as.character(args$broadMSigDBSubCategory)
+runCustomizedDB             <- as.logical(args$runCustomizedDB)
+CustomizedDB                <- as.character(args$CustomizedDB)
 topN                        <- as.numeric(args$topN)
 ## ----------------------------------------------------------------- ##
 # print(sprintf("cpEnrichGoInputType=%s", cpEnrichGoInputType)) ##for debug
@@ -378,6 +388,18 @@ if (runBroadMSigDB) {
     print(sprintf('END step 2.6 category (%s) over-representation analysis', broadMSigDB.category))
   }
   
+}
+## ---
+## 2.7 if 'CustomizedDB' on, use cpORTest() function to conduct customized gene set over representation analysis
+if (runCustomizedDB) {
+  print(sprintf('Start step 2.7 customized gene sets (%s) over-representation analysis', CustomizedDB))
+  cpHallmarkRes <-  cpORTest(gsorInputGenes     = cpEnrInputGeneLists,
+                             gsorInputGenesType = geneListsType,
+                             refGenome          = refGenome4cpenrichGo,
+                             functionDB         = CustomizedDB)
+  resFnamePrefix = paste(enrichGoResSaveDir, '/', resFnameSuffix, '_cpEnrich_customizedDB_', sub("(.txt)|(.gmt.txt)|(.gmt)", "", basename(CustomizedDB)), '_clustered_res', sep = '')
+  outputCpORTestRes(cpORTestRes = cpHallmarkRes, resFnamePrefix = resFnamePrefix, plotTitle = 'Enrichment')
+  print(sprintf('END step 2.7 customized gene sets (%s) over-representation analysis', CustomizedDB))
 }
 ## ---
 print('END step 2: END GSOR analysis')
