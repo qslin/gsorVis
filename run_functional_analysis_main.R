@@ -207,12 +207,12 @@ if (cpEnrichGoInputType == 'DEG_OL') {
   # cpEnrInputGeneLists         <- cpEnrichGoInputFnames
   print(str(cpEnrichGoInputFnames))
   cpEnrInputGeneLists         <- lapply(cpEnrichGoInputFnames, function(x) {
-    resFull                   <- read.delim(file = x, header = T, check.names = F, sep = '\t')
-    if ('gene' %in% colnames(resFull)) {
+    if (endsWith(x, "csv")) { resFull <- read.csv(file = x) } else { resFull <- read.delim(file = x, header = T, check.names = F, sep = '\t') }
+    if ('gene_name' %in% colnames(resFull)) {
       if (topN!=0) {
-        resGenes                  <- resFull$gene[1:topN]
+        resGenes                  <- resFull$gene_name[1:topN]
       } else {
-        resGenes                  <- resFull$gene
+        resGenes                  <- resFull$gene_name
       }
       
     } else {
