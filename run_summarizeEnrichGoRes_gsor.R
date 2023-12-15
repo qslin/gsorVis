@@ -90,7 +90,7 @@ if (length(fulldotplotValInput) == 1) {
   names(fulldotplotVal)     <- cpORenrichmentResAllNames
 }
 ## -
-if (plotTop20) {
+if (plotTop20|plotTop30) {
   if (length(topEnrichDotplotValInput) == 1) {
     topEnrichDotplotVal       <- lapply(cpORenrichmentResAll, function(x) topEnrichDotplotValInput[[1]])
   } else {
@@ -196,10 +196,15 @@ for (i in 1:length(cpORenrichmentResAll)) {
       
       ggsave(filename = adjPdotPlotFname, plot = plotlinkAll, device = 'pdf', width = fulldotplotVal[[i]][1], height = fulldotplotVal[[i]][2], limitsize =F)
       
-      if (plotTop20) {
+      if (plotTop20|plotTop30) {
         # 3.2 top enrichment dotplot
         for (c in 1:length(clusterLevels)) {
-          topOrRes <- dplyr::filter(.data = dataCombDfadjP, Cluster == as.character(clusterLevels[c])) %>% dplyr::filter(between(row_number(p.adjust), 1, 20))
+          if (plotTop20) {
+            topOrRes <- dplyr::filter(.data = dataCombDfadjP, Cluster == as.character(clusterLevels[c])) %>% dplyr::filter(between(row_number(p.adjust), 1, 20))
+          }
+          if (plotTop30) {
+            topOrRes <- dplyr::filter(.data = dataCombDfadjP, Cluster == as.character(clusterLevels[c])) %>% dplyr::filter(between(row_number(p.adjust), 1, 30))
+          }
           if ( c == 1 ) {
             dotplotInput <- topOrRes
           } else {
@@ -212,8 +217,11 @@ for (i in 1:length(cpORenrichmentResAll)) {
           plotlinkAll <- makeDotPlot(res2plot = dotplotInput, padjon = as.logical(fdrOn), xLevels = clusterLevels, ylimit = ylimit, xlimit = xlimit)
         }
         
-        ggsave(filename = adjPtopDotPlotFname, plot = plotlinkAll, device = 'pdf', width = topEnrichDotplotVal[[i]][1], height = topEnrichDotplotVal[[i]][2], limitsize =F)
-        
+        if (plotTop30) {
+          ggsave(filename = sub("_Top20_dotplot", "_Top30_dotplot", adjPtopDotPlotFname), plot = plotlinkAll, device = 'pdf', width = topEnrichDotplotVal[[i]][1], height = topEnrichDotplotVal[[i]][2], limitsize =F)
+        } else {
+          ggsave(filename = adjPtopDotPlotFname, plot = plotlinkAll, device = 'pdf', width = topEnrichDotplotVal[[i]][1], height = topEnrichDotplotVal[[i]][2], limitsize =F)
+        }
       }
       ## ---
     }
