@@ -119,7 +119,7 @@ makeDotPlot <- function(res2plot, padjon, xLevels, yLevels, ylimit=0.05, xlimit=
     # dotPlot <- dotPlot + scale_colour_gradient(name = "original \n p-value\n",
     #                                      limits=c(0, round2(max(cpEnrichGoRes$pvalue), pround.digits)), low="red", high="blue")
   }
-  dotPlot <- dotPlot + scale_size(name = "Gene Count")
+  dotPlot <- dotPlot + scale_size(name = "Gene Count", limits = c(5, xlimit))
   # dotPlot <- dotPlot + scale_size(name = "Gene Ratio", range = c(1,10), breaks = c(0.25, 0.50, 0.75, 1))
   # dotPlot <- dotPlot + scale_size(name = "count", range = c(min(res.pcut$Count), max(res.pcut$Count)),
   #                     breaks=c(min(res.pcut$Count), 5, 10, max(res.pcut$Count)))
